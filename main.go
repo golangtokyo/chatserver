@@ -57,6 +57,8 @@ window.onload = () => {
 </script>
 {{range .Messages -}}
 <div><span class="name">{{.Name}}</span>: {{.Body}}</div>
+{{else}}
+No Message!
 {{- end}}
 `
 
@@ -103,9 +105,6 @@ func getMessages(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 				http.Error(w, msg, http.StatusInternalServerError)
 				return
 			}
-			w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-			io.WriteString(w, "No Message")
-			return
 		}
 
 		// Reverse
