@@ -3,8 +3,9 @@ A simple chat server on Google App Engine. The messages are stored at memcache a
 ## API
 
 ### GET /
-
 ### GET /messages{.html}
+
+Show the messages in HTML.
 
 ### POST /messages
 
