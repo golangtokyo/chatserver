@@ -36,7 +36,7 @@ type Message struct {
 	Body string `json:"body"`
 }
 
-const testForm = `<!DOCTYPE html>
+const devForm = `<!DOCTYPE html>
 <script>
 window.addEventListener('load', _ => {
   document.getElementById('submit-button').addEventListener('click', _ => {
@@ -59,13 +59,10 @@ Body: <input id="body" type="text">
 
 func getMessages(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	switch r.URL.Path {
-	default:
-		http.NotFound(w, r)
-
 	case "/dev":
 		if appengine.IsDevAppServer() {
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
-			io.WriteString(w, testForm)
+			io.WriteString(w, devForm)
 			return
 		}
 
@@ -86,7 +83,10 @@ func getMessages(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 		for _, m := range messages {
 			io.WriteString(w, fmt.Sprintf("%s: %s\n", m.Name, m.Body))
 		}
+		return
 	}
+
+	http.NotFound(w, r)
 }
 
 func postMessages(ctx context.Context, w http.ResponseWriter, r *http.Request) {
