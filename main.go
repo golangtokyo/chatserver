@@ -21,6 +21,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"sort"
 
 	"golang.org/x/net/context" // Use this until Go 1.9's type alias is available
 	"google.golang.org/appengine"
@@ -100,6 +101,11 @@ func getMessages(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 			io.WriteString(w, "No Message")
 			return
 		}
+
+		// Revece
+		sort.Slice(messages, func(i, j int) bool {
+			return i >= j
+		})
 
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		messagesHTML.Execute(w, map[string]interface{}{
