@@ -49,6 +49,13 @@ body {
   font-weight: bold;
 }
 </style>
+<script>
+window.onload = () => {
+  setTimeout(() => {
+    location.reload();
+  }, 5000);
+};
+</script>
 {{range .Messages -}}
 <div><span class="name">{{.Name}}</span>: {{.Body}}</div>
 {{- end}}
