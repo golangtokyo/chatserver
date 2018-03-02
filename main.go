@@ -17,6 +17,7 @@ package chatserver
 import (
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -36,7 +37,23 @@ type Message struct {
 	Body string `json:"body"`
 }
 
-const devForm = `<!DOCTYPE html>
+const (
+	messagesHTMLTmpl = `<!DOCTYPE html>
+<title>Chat Server - golang.tokyo #13</title>
+<style>
+body {
+  font-family: Sans-Serif;
+}
+.name {
+  font-weight: bold;
+}
+</style>
+{{range .Messages -}}
+<div><span class="name">{{.Name}}</span>: {{.Body}}</div>
+{{- end}}
+`
+
+	devForm = `<!DOCTYPE html>
 <script>
 window.addEventListener('load', _ => {
   document.getElementById('submit-button').addEventListener('click', _ => {
@@ -56,6 +73,11 @@ Name: <input id="name" type="text">
 Body: <input id="body" type="text">
 <button id="submit-button">Submit</button>
 `
+)
+
+var (
+	messagesHTML = template.Must(template.New("messages").Parse(messagesHTMLTmpl))
+)
 
 func getMessages(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	switch r.URL.Path {
@@ -79,10 +101,10 @@ func getMessages(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-		for _, m := range messages {
-			io.WriteString(w, fmt.Sprintf("%s: %s\n", m.Name, m.Body))
-		}
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		messagesHTML.Execute(w, map[string]interface{}{
+			"Messages": messages,
+		})
 		return
 	}
 
@@ -137,8 +159,9 @@ func postMessages(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	}
 
 	messages = append(messages, message)
-	if len(messages) > 10 {
-		messages = messages[len(messages)-10:]
+	const maxMessageNum = 50
+	if len(messages) > maxMessageNum {
+		messages = messages[len(messages)-maxMessageNum:]
 	}
 	item.Object = messages
 
