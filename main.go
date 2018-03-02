@@ -109,7 +109,7 @@ func getMessages(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Revece
+		// Reverse
 		sort.Slice(messages, func(i, j int) bool {
 			return i >= j
 		})
