@@ -42,7 +42,7 @@ window.addEventListener('load', _ => {
   document.getElementById('submit-button').addEventListener('click', _ => {
     let name = document.getElementById('name').value;
     let body = document.getElementById('body').value;
-    fetch('/', {
+    fetch('/messages', {
       method: 'POST',
       body:   JSON.stringify({'name': name, 'body': body}),
     }).then(response => {
@@ -66,7 +66,7 @@ func getMessages(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-	case "/":
+	case "/", "/messages", "/messages.html":
 		messages := []Message{}
 		if _, err := memcache.JSON.Get(ctx, messagesKey, &messages); err != nil {
 			if err != memcache.ErrCacheMiss {
@@ -90,7 +90,7 @@ func getMessages(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 }
 
 func postMessages(ctx context.Context, w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
+	if r.URL.Path != "/messages" {
 		http.NotFound(w, r)
 		return
 	}
