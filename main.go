@@ -21,7 +21,6 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"sort"
 
 	"golang.org/x/net/context" // Use this until Go 1.9's type alias is available
 	"google.golang.org/appengine"
@@ -110,13 +109,14 @@ func getMessages(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Reverse
-		sort.Slice(messages, func(i, j int) bool {
-			return i >= j
-		})
+		messagesToShow := make([]Message, len(messages))
+		for i, m := range messages {
+			messagesToShow[len(messages)-i-1] = m
+		}
 
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		messagesHTML.Execute(w, map[string]interface{}{
-			"Messages": messages,
+			"Messages": messagesToShow,
 		})
 		return
 	}
